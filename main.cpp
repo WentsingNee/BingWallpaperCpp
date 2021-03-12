@@ -1,9 +1,8 @@
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <kerbal/container/array.hpp>
-#include <kerbal/container/flat_ordered.hpp>
+#include <kerbal/container/static_ordered.hpp>
 #include <iostream>
-#include <fstream>
 #include <thread>
 #include <mutex>
 #include <filesystem>
@@ -26,14 +25,12 @@ struct BingImgExtract
 		}
 };
 
-using BingImgSet = kerbal::container::flat_ordered<BingImg, std::string, std::less<std::string>, BingImgExtract>;
+using MaxNum = kerbal::type_traits::integral_constant<size_t, 10>;
+using BingImgSet = kerbal::container::static_ordered<BingImg, MaxNum::value, std::string, std::less<std::string>, BingImgExtract>;
 
 BingImgSet getBingImgSet()
 {
-	using MaxNum = kerbal::type_traits::integral_constant<size_t, 10>;
-	BingImgSet bingImgSet; {
-		bingImgSet.reserve(MaxNum::value);
-	}
+	BingImgSet bingImgSet;
 	std::mutex bingImgSetMutex;
 
 	kerbal::container::array<std::thread, MaxNum::value> threads;
@@ -44,7 +41,7 @@ BingImgSet getBingImgSet()
 			auto r = cpr::Get(cpr::Url{"https://www.bing.com/HPImageArchive.aspx"},
 							  cpr::Parameters{
 									  {"format", "js"},
-									  {"idx",    std::to_string(i + 1)},
+									  {"idx",    std::to_string(i)},
 									  {"n",      "1"},
 									  {"mkt",    "en-Us"}
 							  });
@@ -53,7 +50,7 @@ BingImgSet getBingImgSet()
 			const auto &img = json["images"][0];
 
 			std::lock_guard<std::mutex> guard(bingImgSetMutex);
-			bingImgSet.unique_insert(BingImg{
+			bingImgSet.try_insert(BingImg{
 					.startdate = img["startdate"],
 					.url = "http://www.bing.com/" + (std::string)img["url"],
 					.copyright = img["copyright"],
