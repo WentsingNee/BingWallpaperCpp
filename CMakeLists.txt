@@ -26,3 +26,7 @@ endif ()
 
 target_link_libraries(BingWallpaperCpp PUBLIC ${LIB_CPR})
 target_link_libraries(BingWallpaperCpp PUBLIC ${LIB_SQLITE3})
+
+
+add_executable(log2sqlite log2sqlite.cpp)
+target_link_libraries(log2sqlite PUBLIC ${LIB_SQLITE3})
