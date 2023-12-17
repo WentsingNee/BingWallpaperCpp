@@ -1,0 +1,18 @@
+{
+  "name" : "bingwallpaper-cpp",
+  "version" : "2023.12.1",
+  "dependencies" : [ {
+    "name" : "kerbal",
+    "version>=" : "2023.12.1"
+  }, {
+    "name" : "cpr",
+    "version>=" : "1.10.5#1"
+  }, {
+    "name" : "fmt",
+    "version>=" : "10.1.1"
+  }, {
+    "name" : "nlohmann-json",
+    "version>=" : "3.11.3"
+  } ],
+  "builtin-baseline" : "f7b0aa82d361cf8083df4309526789be986aa9e6"
+}

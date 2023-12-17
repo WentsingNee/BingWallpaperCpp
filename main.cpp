@@ -1,8 +1,9 @@
-#include <kerbal/compare/basic_compare.hpp>
-#include <kerbal/container/static_ordered.hpp>
+#include <kerbal/container/avl_ordered.hpp>
+#include <kerbal/container/static_vector.hpp>
 #include <kerbal/type_traits/integral_constant.hpp>
 
 #include <cpr/cpr.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <sqlite3pp.h>
 
@@ -21,14 +22,16 @@ struct BingImg
 
 struct BingImgExtract
 {
+		using key_type = std::string;
+
 		const std::string & operator()(const BingImg & img) const noexcept
 		{
 			return img.startdate;
 		}
 };
 
-using MaxNum = kerbal::type_traits::integral_constant<size_t, 10>;
-using BingImgSet = kerbal::container::static_ordered<BingImg, MaxNum::value, std::string, kerbal::compare::less<std::string>, BingImgExtract>;
+using MaxNum = kerbal::type_traits::integral_constant<std::size_t, 10>;
+using BingImgSet = kerbal::container::avl_ordered<BingImg, BingImgExtract>;
 
 BingImgSet getBingImgSet()
 {
@@ -58,7 +61,7 @@ BingImgSet getBingImgSet()
 		}
 		const auto &img = json["images"][0];
 
-		bingImgSet.try_insert(BingImg{
+		bingImgSet.insert_unique(BingImg{
 				.startdate = img["startdate"],
 				.url = "http://www.bing.com/" + (std::string)img["url"],
 				.copyright = img["copyright"],
@@ -96,14 +99,21 @@ int main()
 	);
 
 	for (const auto &e : bingImgSet) {
-		cout << "startdate: " << e.startdate << "\n"
-				<< "copyright: " << e.copyright << "\n"
-				<< "url: " << e.url << "\n"
-				<< "search: " << e.copyrightlink << "\n"
-				<< "hsh: " << e.hsh << "\n";
+		cout << fmt::format(
+			"startdate: {}\n"
+			"copyright: {}\n"
+			"url: {}\n"
+			"search: {}\n"
+			"hsh: {}\n",
+			e.startdate,
+			e.copyright,
+			e.url,
+			e.copyrightlink,
+			e.hsh
+		);
 
 		auto r = cpr::Get(cpr::Url{e.url});
-		std::ofstream img("./img/" + e.startdate + ".jpg", std::ios::out);
+		std::ofstream img(fmt::format("./img/{}.jpg", e.startdate), std::ios::out);
 		img << r.text << std::flush;
 
 		sqlite3pp::command insert_cmd(db, "INSERT INTO img (startdate, copyright, url, search, hsh) VALUES (?, ?, ?, ?, ?)");
