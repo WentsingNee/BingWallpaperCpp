@@ -30,4 +30,3 @@ target_link_libraries(
 
 add_executable(log2sqlite log2sqlite.cpp)
 target_link_libraries(log2sqlite PRIVATE unofficial::sqlite3::sqlite3)
-
