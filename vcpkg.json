@@ -1,21 +1,27 @@
 {
-  "name" : "bingwallpaper-cpp",
-  "version" : "2025.3.1",
-  "dependencies" : [ {
-    "name" : "cpr",
-    "version>=" : "1.10.5#2"
-  }, {
-    "name" : "fmt",
-    "version>=" : "10.2.1#1"
-  }, {
-    "name" : "kerbal",
-    "version>=" : "2024.11.1"
-  },{
-    "name" : "nlohmann-json",
-    "version>=" : "3.11.3"
-  }, {
-    "name" : "sqlitecpp",
-    "version>=" : "3.3.2"
-  } ],
-  "builtin-baseline" : "f7b0aa82d361cf8083df4309526789be986aa9e6"
+  "name": "bingwallpaper-cpp",
+  "version": "2025.3.1",
+  "dependencies": [
+    {
+      "name": "cpr",
+      "version>=": "1.11.2"
+    },
+    {
+      "name": "fmt",
+      "version>=": "11.0.2#1"
+    },
+    {
+      "name": "kerbal",
+      "version>=": "2024.11.1"
+    },
+    {
+      "name": "nlohmann-json",
+      "version>=": "3.12.0"
+    },
+    {
+      "name": "sqlitecpp",
+      "version>=": "3.3.2"
+    }
+  ],
+  "builtin-baseline": "e0b65b8ccab766d7570a6734b9b2e6388a27bf41"
 }
