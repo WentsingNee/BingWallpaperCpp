@@ -5,7 +5,7 @@
 #include <cpr/cpr.h>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
-#include <sqlite3pp.h>
+#include <SQLiteCpp/SQLiteCpp.h>
 
 #include <iostream>
 #include <filesystem>
@@ -87,9 +87,9 @@ int main()
 	cout << "download: " << bingImgSet.size() << " pictures" << endl;
 	cout << endl;
 
-	sqlite3pp::database db("bingimg.db");
-	db.execute(
-			"CREATE TABLE img("
+	SQLite::Database db("bingimg.db", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+	db.exec(
+			"CREATE TABLE IF NOT EXISTS img("
 			"	startdate TEXT UNIQUE,"
 			"	copyright TEXT,"
 			"	url TEXT,"
@@ -116,13 +116,17 @@ int main()
 		std::ofstream img(fmt::format("./img/{}.jpg", e.startdate), std::ios::out);
 		img << r.text << std::flush;
 
-		sqlite3pp::command insert_cmd(db, "INSERT INTO img (startdate, copyright, url, search, hsh) VALUES (?, ?, ?, ?, ?)");
-		insert_cmd.bind(1, e.startdate, sqlite3pp::nocopy);
-		insert_cmd.bind(2, e.copyright, sqlite3pp::nocopy);
-		insert_cmd.bind(3, e.url, sqlite3pp::nocopy);
-		insert_cmd.bind(4, e.copyrightlink, sqlite3pp::nocopy);
-		insert_cmd.bind(5, e.hsh, sqlite3pp::nocopy);
-		insert_cmd.execute();
+		SQLite::Statement insert_cmd(db, "INSERT INTO img (startdate, copyright, url, search, hsh) VALUES (?, ?, ?, ?, ?)");
+		insert_cmd.bind(1, e.startdate);
+		insert_cmd.bind(2, e.copyright);
+		insert_cmd.bind(3, e.url);
+		insert_cmd.bind(4, e.copyrightlink);
+		insert_cmd.bind(5, e.hsh);
+		try {
+			insert_cmd.exec();
+		} catch (std::exception const & e) {
+			std::cerr << e.what() << std::endl;
+		}
 
 		cout << endl;
 	}

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(BingWallpaperCpp main.cpp)
 
-foreach (lib IN ITEMS cpr fmt Kerbal nlohmann_json unofficial-sqlite3)
+foreach (lib IN ITEMS cpr fmt Kerbal nlohmann_json SQLiteCpp)
     message(STATUS "Finding ${lib} ...")
     find_package(${lib} REQUIRED)
     message(STATUS "Finding ${lib} -- Found")
@@ -24,9 +24,9 @@ target_link_libraries(
             fmt::fmt
             Kerbal::kerbal
             nlohmann_json::nlohmann_json
-            unofficial::sqlite3::sqlite3
+            SQLiteCpp
 )
 
 
 add_executable(log2sqlite log2sqlite.cpp)
-target_link_libraries(log2sqlite PRIVATE unofficial::sqlite3::sqlite3)
+target_link_libraries(log2sqlite PRIVATE SQLiteCpp)

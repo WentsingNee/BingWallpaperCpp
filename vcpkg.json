@@ -14,8 +14,8 @@
     "name" : "nlohmann-json",
     "version>=" : "3.11.3"
   }, {
-    "name" : "sqlite3",
-    "version>=" : "3.45.2"
+    "name" : "sqlitecpp",
+    "version>=" : "3.3.2"
   } ],
   "builtin-baseline" : "f7b0aa82d361cf8083df4309526789be986aa9e6"
 }

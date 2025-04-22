@@ -9,19 +9,37 @@
  *   all rights reserved
  */
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <regex>
 
-#include <sqlite3pp.h>
+#include <SQLiteCpp/SQLiteCpp.h>
 
 
-int main()
+int main(int argc, char * argv[])
 {
-	sqlite3pp::database db("bingimg.db");
+	if (argc != 3) {
+		std::cerr << "Usage: " << argv[0] << " in-log.txt out.db" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+
+	char const * in_log = argv[1];
+	char const * out_db = argv[2];
+
+	SQLite::Database db(out_db, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+	db.exec(
+			"CREATE TABLE IF NOT EXISTS img("
+			"	startdate TEXT UNIQUE,"
+			"	copyright TEXT,"
+			"	url TEXT,"
+			"	search TEXT,"
+			"	hsh TEXT"
+			")"
+	);
 
 	std::string s; {
-		std::ifstream fin("/home/peter/old_sys/home/peter/BingWallpaperCpp.log");
+		std::ifstream fin(in_log);
 		while (fin) {
 			s += fin.get();
 		}
@@ -70,13 +88,17 @@ int main()
 				  << "hsh: " << hsh << "\n";
 		std::cout << std::endl;
 
-		sqlite3pp::command insert_cmd(db, "INSERT INTO img (startdate, copyright, url, search, hsh) VALUES (?, ?, ?, ?, ?)");
-		insert_cmd.bind(1, startdate, sqlite3pp::copy);
-		insert_cmd.bind(2, copyright, sqlite3pp::copy);
-		insert_cmd.bind(3, url, sqlite3pp::copy);
-		insert_cmd.bind(4, search, sqlite3pp::copy);
-		insert_cmd.bind(5, hsh, sqlite3pp::copy);
-		insert_cmd.execute();
+		SQLite::Statement insert_cmd(db, "INSERT INTO img (startdate, copyright, url, search, hsh) VALUES (?, ?, ?, ?, ?)");
+		insert_cmd.bind(1, startdate);
+		insert_cmd.bind(2, copyright);
+		insert_cmd.bind(3, url);
+		insert_cmd.bind(4, search);
+		insert_cmd.bind(5, hsh);
+		try {
+			insert_cmd.exec();
+		} catch (std::exception const & e) {
+			std::cerr << e.what() << std::endl;
+		}
 
 		sbegin += match.length();
 		++cnt;
