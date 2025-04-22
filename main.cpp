@@ -22,9 +22,9 @@ struct BingImg
 
 struct BingImgExtract
 {
-		using key_type = std::string;
+		typedef std::string const & key_type;
 
-		const std::string & operator()(const BingImg & img) const noexcept
+		key_type operator()(const BingImg & img) const noexcept
 		{
 			return img.startdate;
 		}
